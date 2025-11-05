@@ -116,7 +116,9 @@ NEWSCHEMA('Tickets', function(schema) {
 			let builder = DATA.query(sql);
 			let query = $.query;
 
-			builder.where("(a.parentid IS NULL OR (a.parentid IS NOT NULL AND ownerid<>'{0}' AND EXISTS(SELECT 1 FROM view_ticket x WHERE x.id=a.id AND (ownerid='{0}' OR '{0}'=ANY(x.userid) OR '{0}'=ANY(x.watcherid)))))".format($.user.id));
+			// the condition ownerid<>'{0}' blocks unread tickets
+			builder.where("(a.parentid IS NULL OR (a.parentid IS NOT NULL AND EXISTS(SELECT 1 FROM view_ticket x WHERE x.id=a.id AND (ownerid='{0}' OR '{0}'=ANY(x.userid) OR '{0}'=ANY(x.watcherid)))))".format($.user.id));
+			// builder.where("(a.parentid IS NULL OR (a.parentid IS NOT NULL AND ownerid<>'{0}' AND EXISTS(SELECT 1 FROM view_ticket x WHERE x.id=a.id AND (ownerid='{0}' OR '{0}'=ANY(x.userid) OR '{0}'=ANY(x.watcherid)))))".format($.user.id));
 			// builder.where("(a.parentid IS NULL OR (a.ownerid<>'{0}' AND a.parentid IS NOT NULL))".format($.user.id));
 			makefilter($, builder);
 
