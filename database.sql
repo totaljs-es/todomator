@@ -269,7 +269,6 @@ CREATE VIEW view_ticket AS
 		a.statusid,
 		a.parentid,
 		a.userid,
-		a.watcherid,
 		a.name,
 		a.worked,
 		a.estimate,
@@ -287,7 +286,6 @@ CREATE VIEW view_ticket AS
 		a.isbillable,
 		d.name AS status,
 		d.sortindex,
-		d.icon AS status_icon,
 		d.color AS status_color,
 		a.search,
 		b.isprivate,
@@ -298,13 +296,15 @@ CREATE VIEW view_ticket AS
 		a.source,
 		a.markdown,
 		a.ispublic,
+		d.icon AS status_icon,
 		a.note,
-		a.attrs
+		a.watcherid,
+		a.attrs,
+		ARRAY(SELECT tbl_ticket.id FROM tbl_ticket WHERE tbl_ticket.parentid = a.id) AS children
 	FROM tbl_ticket a
 	LEFT JOIN tbl_folder b ON b.id = a.folderid
 	LEFT JOIN cl_status d ON d.id = a.statusid
-	WHERE
-		a.isremoved = false;
+	WHERE a.isremoved = false;
 
 CREATE VIEW view_ticket_time AS
 	SELECT
