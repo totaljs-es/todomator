@@ -8,13 +8,17 @@
 	<meta name="format-detection" content="telephone=no" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover" />
 	<meta name="robots" content="all,follow" />
-	<link rel="stylesheet" href="@{'%cdn'}/spa.min@19.css" />
-	<script src="@{'%cdn'}/spa.min@19.js"></script>
-	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<link rel="stylesheet" href="@{'%cdn'}/spa.min@20.css" />
+	<script src="@{'%cdn'}/spa.min@20.js"></script>
 	<meta name="apple-mobile-web-app-title" content="Todomator" />
 	<link rel="apple-touch-icon" href="/icon.png" />
 	@{import('meta', 'head', 'favicon.ico')}
 	<style>
+
+		:root {
+			--radius: 6px;
+		}
+
 		html, body { padding: 0; margin: 0; background-color: #F0F0F0; }
 		.login.panel { width: 320px; background-color: #FFF; margin: 0 auto; text-align: left; border-radius: var(--radius); box-shadow: 0 0 80px rgba(0,0,0,0.1); }
 		.login.panel button { background-color: var(--color); color: #FFF; width: 100%; border: 0; height: 45px; border-radius: var(--radius); font-weight: bold; }
@@ -41,8 +45,18 @@
 			<ui-bind path="common.type" config="show:value === 'login'" class="hidden">
 				<ui-plugin path="formlogin" class="padding npt">
 					<ui-component name="autofill">
-						<ui-component name="input" path="?.email" config="required:1;type:email;autofill:1" default="'@'" class="m email">@(E-mail address)</ui-component>
-						<ui-component name="input" path="?.password" config="required:1;type:password;autofill:1" default="''" class="m">@(Password)</ui-component>
+
+						<ui-bind path="?.is2fa" config="disabled" class="block">
+							<ui-component name="input" path="?.email" config="required:1;type:email;autofill:1" default="'@'" class="m email">@(E-mail address)</ui-component>
+							<ui-component name="input" path="?.password" config="required:1;type:password;autofill:1" default="''" class="m">@(Password)</ui-component>
+						</ui-bind>
+
+						<ui-bind path="?.is2fa" config="show" class="block hidden">
+							<hr />
+							<p><i class="ti ti-key mr5"></i>@(A verification code has been sent to your email address. Please enter it in the field below.)</p>
+							<ui-component name="input" path="?.code" config="required:1;maxlength:6;monospace:1;icon:ti ti-envelope" default="''" class="m">Verification code</ui-component>
+						</ui-bind>
+
 						<ui-component name="validate" path="?" style="margin-top:20px">
 							<button name="submit" class="exec" data-exec="?/submit" disabled><i class="ti ti-key"></i>@(Sign-in)</button>
 						</ui-component>
@@ -74,8 +88,11 @@
 
 			exports.submit = function() {
 				var form = exports.form;
-				exports.tapi('login ERROR', form, function(response) {
-					location.href = location.href;
+				exports.tapi('Users|login ERROR', form, function(response) {
+					if (response.value === 'code')
+						exports.set('is2fa', true);
+					else
+						location.href = location.href;
 				});
 			};
 

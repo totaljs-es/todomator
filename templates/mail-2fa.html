@@ -1,0 +1,18 @@
+<title>@(2FA code: {{ value.code }})</title>
+
+<div style="padding:20px">
+	<div style="font-size:18px;font-weight:bold;margin-bottom:10px">@(Two-factor authentication)</div>
+	<div>@(Use the verification code below to complete your sign-in.)</div>
+	<div style="margin-top:15px;color:#888">@(If you did not attempt to sign in, you can safely ignore this email.)</div>
+	<br>
+	<div style="border-top:1px solid rgba(100,100,100,0.2)">
+		<div style="margin:15px 0 5px;color:gray">@(Verification code):</div>
+		<div style="font-size:22px;font-weight:bold;letter-spacing:4px">{{ value.code }}</div>
+	</div>
+</div>
+
+<script type="text/json">
+	{
+		"code": "123456"
+	}
+</script>

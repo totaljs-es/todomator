@@ -4,6 +4,7 @@ html,body { overflow: hidden; margin: 0; padding: 0; color: #303030; overscroll-
 	--radius: 5px;
 }
 
+.radius { border-radius: var(--radius); }
 .ui-dark h2 { border-bottom-color: #404040; color: #FFF; }
 
 .color { color: var(--color); }

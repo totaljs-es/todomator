@@ -91,8 +91,11 @@ NEWSCHEMA('Tickets', function(schema) {
 			if (own)
 				builder.query("('{0}'=ANY(a.userid) AND ARRAY_LENGTH(a.userid,1)=1) OR ('{0}'=ANY(a.userid) AND ownerid<>'{0}')".format($.user.id));
 
-			if (search)
-				builder.or(b => b.search('a.search', search.toSearch()).search('a.id', search));
+			if (search) {
+				let keywords = search.toKeywords(true, true);
+				for (let keyword of keywords)
+					builder.search('a.search', keyword);
+			}
 
 			if (user)
 				builder.query('(SELECT ARRAY_TO_STRING(ARRAY_AGG(search), \',\') FROM tbl_user x WHERE x.id=ANY(a.userid)) ILIKE ' + PG_ESCAPE(user));

@@ -15,7 +15,7 @@
 	}
 </style>
 
-<ui-component name="box" path="common.form" config="if:~PATH~;icon:users;title:@(Users);autofocus:true;reload:?/reload;scrollbar:1;width:800" class="hidden CLASS" plugin="~PATH~">
+<ui-component name="box" path="*form" config="if:CLASS;icon:users;title:@(Users);autofocus:true;reload:?/reload;scrollbar:1;width:800" class="hidden CLASS" plugin="CLASS">
 	<nav>
 		<button class="exec" data-exec="?/create"><i class="ti ti-plus-circle green"></i>@(Create)</button>
 	</nav>
@@ -62,32 +62,32 @@
 		};
 
 		exports.refresh = function() {
-			exports.tapi('users ERROR', function(response) {
+			exports.tapi('Users @showloading ERROR', function(response) {
 				for (var item of response) {
 					var tmp = item.name.split(' ').trim();
 					item.initials = tmp[0].substring(0, 1) + (tmp[1] ? tmp[1].substring(0, 1) : '');
 				}
-				exports.set('items', response)
+				exports.set('items @hideloading', response)
 			});
 		};
 
 		exports.create = function(el) {
 			SET('formuser @default', { password: GUID(10) });
-			SET('common.form2', 'formuser');
+			SET('*form2', 'formuser');
 		};
 
 		exports.edit = function(el) {
 			var id = ATTRD(el);
-			exports.tapi('users_read/{0} ERROR'.format(id), function(response) {
+			exports.tapi('Users|read ERROR', { id: id }, function(response) {
 				SET('formuser @reset', response);
-				SET('common.form2', 'formuser');
+				SET('*form2', 'formuser');
 			});
 		};
 
 		exports.remove = function(el) {
-			var id = ATTRD(el);
-			EXEC('-approve/show', '@(Are you sure you want to remove selected user?)', '"ti ti-remove" @(Remove)', function() {
-				exports.tapi('users_remove/{0} ERROR'.format(id), exports.refresh);
+			let id = ATTRD(el);
+			EXEC('-approve/show', '@(Are you sure you want to remove selected user?)', ':ti ti-remove: @(Remove)', function() {
+				exports.tapi('Users|remove ERROR', { id: id }, exports.refresh);
 			});
 		};
 

@@ -1,6 +1,6 @@
-<ui-component name="importer" path="common.form" config="if:formusers;url:/~ID~/users.html"></ui-component>
-<ui-component name="importer" path="common.form" config="if:formpassword;url:/~ID~/password.html"></ui-component>
-<ui-component name="importer" path="common.form2" config="if:formuser;url:/~ID~/user.html"></ui-component>
+<ui-component name="importer" path="*form" config="if:formusers;url:/~ID~/users.html"></ui-component>
+<ui-component name="importer" path="*form" config="if:formpassword;url:/~ID~/password.html"></ui-component>
+<ui-component name="importer" path="*form2" config="if:formuser;url:/~ID~/user.html"></ui-component>
 
 <script>
 
@@ -10,14 +10,14 @@
 			var callback = function(model, selected) {
 				switch (selected.id) {
 					case 'password':
-						SET('formpassword @reset', '{}');
-						SET('common.form', 'formpassword');
+						SET('formpassword @reset', { is2fa: user.is2fa });
+						SET('*form', 'formpassword');
 						break;
 					case 'logout':
 						location.href = '/logout/';
 						break;
 					default:
-						SET('common.form', 'form' + selected.id);
+						SET('*form', 'form' + selected.id);
 						break;
 				}
 			};

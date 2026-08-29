@@ -38,12 +38,13 @@ NEWACTION('Common/version', {
 NEWACTION('Account/read', {
 	name: 'Read session',
 	action: function($) {
-		var user = $.user;
-		var obj = {};
+		let user = $.user;
+		let obj = {};
 		obj.id = user.id;
 		obj.name = user.name;
 		obj.sa = user.sa;
 		obj.photo = user.photo;
+		obj.is2fa = user.is2fa;
 		obj.language = user.language;
 		obj.permissions = user.permissions;
 		$.callback(obj);

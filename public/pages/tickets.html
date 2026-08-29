@@ -157,15 +157,15 @@
 
 	<ui-component name="navlayout" path="?.menu" config="parent:auto;width:200;margin:58" class="invisible">
 		<section style="background-color:#fff">
-			<ui-component name="aselected" config="selector:.item">
+			<ui-component name="aselected" config="selector:.item;attr:data-href">
 				<div class="nav">
 					<nav>
-						<a href="/" class="item exec jR"><ui-bind path="?.counter.unresolved" config="text:value>99?99:value;show" class="hidden counter">0</ui-bind><i class="ti ti-spinner"></i>@(Open)</a>
-						<a href="/review/" class="item exec jR"><ui-bind path="?.counter.review" config="text:value>99?99:value;show" class="hidden counterunread">0</ui-bind><i class="ti ti-clean"></i>@(Review)</a>
-						<a href="/unread/" class="item exec jR"><ui-bind path="?.counter.unread" config="text:value>99?99:value;show" class="hidden counterunread">0</ui-bind><i class="ti ti-bell"></i>@(Unread)</a>
-						<a href="/bookmarks/" class="item exec jR"><ui-bind path="?.counter.bookmarks" config="text:value>99?99:value;show" class="hidden counterbookmark">0</ui-bind><i class="ti ti-bookmark"></i>@(Bookmarks)</a>
-						<a href="/postponed/" class="item exec jR"><i class="ti ti-history"></i>@(Postponed)</a>
-						<a href="/all/" class="item exec jR"><i class="ti ti-archive"></i>@(All tickets)</a>
+						<div data-href="/" class="item exec jR"><ui-bind path="?.counter.unresolved" config="text:value>99?99:value;show" class="hidden counter">0</ui-bind><i class="ti ti-spinner"></i>@(Open)</div>
+						<div data-href="/review/" class="item exec jR"><ui-bind path="?.counter.review" config="text:value>99?99:value;show" class="hidden counterunread">0</ui-bind><i class="ti ti-clean"></i>@(Review)</div>
+						<div data-href="/unread/" class="item exec jR"><ui-bind path="?.counter.unread" config="text:value>99?99:value;show" class="hidden counterunread">0</ui-bind><i class="ti ti-bell"></i>@(Unread)</div>
+						<div data-href="/bookmarks/" class="item exec jR"><ui-bind path="?.counter.bookmarks" config="text:value>99?99:value;show" class="hidden counterbookmark">0</ui-bind><i class="ti ti-bookmark"></i>@(Bookmarks)</div>
+						<div data-href="/postponed/" class="item exec jR"><i class="ti ti-history"></i>@(Postponed)</div>
+						<div data-href="/all/" class="item exec jR"><i class="ti ti-archive"></i>@(All tickets)</div>
 					</nav>
 				</div>
 				<div class="searchfolders">
@@ -178,7 +178,7 @@
 								<script type="text/html">
 									{{ foreach m in value }}
 										{{ if !m.isarchived }}
-											<a href="/{{ m.id }}/" class="exec item hellip jR{{ if m.ispinned }} b{{ fi }}" data-id="{{ m.id }}" data-search="{{ m.name }}"><i class="{{ m.icon }} fs12" style="color:{{ m.color }}"></i>{{ m.name }}{{ if m.ispinned }}<i class="ti ti-pin-alt isprivate" title="@(Pinned)"></i>{{ else if m.isprivate }}<i class="ti ti-star-alt isprivate" title="@(Private)"></i>{{ fi }}</a>
+											<div data-href="/{{ m.id }}/" class="exec item hellip jR{{ if m.ispinned }} b{{ fi }}" data-id="{{ m.id }}" data-search="{{ m.name }}"><i class="{{ m.icon }} fs12" style="color:{{ m.color }}"></i>{{ m.name }}{{ if m.ispinned }}<i class="ti ti-pin-alt isprivate" title="@(Pinned)"></i>{{ else if m.isprivate }}<i class="ti ti-star-alt isprivate" title="@(Private)"></i>{{ fi }}</div>
 										{{ fi }}
 									{{ end }}
 								</script>
@@ -372,6 +372,8 @@
 
 				var reg = (/\#(\s|@|$)/);
 
+				filter.type = 'all';
+
 				if (reg.test(search)) {
 					search = search.replace(reg, text => text.substring(1)).trim();
 					filter.type = 'inprogress';
@@ -386,8 +388,8 @@
 
 				if (search.indexOf('@') !== -1)
 					filter.admin = 1;
-
 			}
+
 
 			filter.q = search;
 			filter.skip = skip;
@@ -626,6 +628,7 @@
 			opt.align = 'left';
 			opt.items = [];
 			opt.items.push({ id: 'tickets', name: '@(Refresh tickets)', icon: 'ti ti-sync' });
+			opt.items.push({ id: 'feedback', name: '@(Give a feedback)', icon: 'ti ti-bullhorn' });
 
 			if (user.sa || user.permissions.includes('admin')) {
 				opt.items.push('-');
@@ -635,6 +638,7 @@
 
 			if (user.sa) {
 				opt.items.push('-');
+				// opt.items.push({ id: 'billing', name: '@(Billing)', icon: 'ti ti-credit-card' });
 				opt.items.push({ id: 'settings', name: '@(Settings)', icon: 'ti ti-cog' });
 			}
 

@@ -1,3 +1,4 @@
-database             (env)      : DATABASE
-pooling                         : 1
-$api                            : /api/
+// database          (env)     : DATABASE
+database                    : postgresql://total:platform@127.0.0.1:5432/todomator
+$api                        : /api/
+mail              (Object)  : {"server":"hostname","port":587,"secure":false,"user":"user","password":"password","tls":{"ciphers":"SSLv3"},"from":"robot@totaljs.com"}

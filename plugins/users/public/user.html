@@ -28,7 +28,8 @@
 			</div>
 			<ui-component name="input" path="?.sa" config="type:checkbox" class="b">@(Super admin)</ui-component>
 			<ui-component name="input" path="?.notifications" config="type:checkbox" default="true">@(Enable notifications)</ui-component>
-			<ui-component name="input" path="?.isdisabled" config="type:checkbox">@(Disable user account)</ui-component>
+			<ui-component name="input" path="?.is2fa" config="type:checkbox" default="true">@(Enable 2FA authentication)</ui-component>
+			<ui-component name="input" path="?.isdisabled" config="type:checkbox">@(Ban the user account)</ui-component>
 			<ui-bind path="?.id" config="show" class="block hidden">
 				<ui-component name="input" path="?.isinactive" config="type:checkbox">@(User is inactive)</ui-component>
 			</ui-bind>
@@ -59,9 +60,8 @@
 		};
 
 		exports.submit = function(hide) {
-			var form = exports.form;
-
-			exports.tapi('users_{0} ERROR'.format(form.id ? ('update/' + form.id) : 'create'), form, function() {
+			let form = exports.form;
+			exports.tapi('Users|save @showloading ERROR', form, function() {
 				hide();
 				CLRELOAD('cl');
 				SETTER('notify/success', '@(The user has been saved successfully)');

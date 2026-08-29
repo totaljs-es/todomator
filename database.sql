@@ -40,6 +40,7 @@ CREATE TABLE "public"."tbl_user" (
 	"notifyurl" text,
 	"sa" bool DEFAULT false,
 	"notifications" bool DEFAULT true,
+	"is2fa" bool DEFAULT false,
 	"isinactive" bool DEFAULT false,
 	"isdisabled" bool DEFAULT false,
 	"isonline" bool DEFAULT false,

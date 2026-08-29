@@ -61,6 +61,7 @@
 	<ui-component name="importer" path="*form2" config="if:formcreateticket;url:/forms/ticket.html"></ui-component>
 	<ui-component name="importer" path="*form" config="if:formsettings;url:/forms/settings.html"></ui-component>
 	<ui-component name="importer" path="*form" config="if:formtags;url:/forms/tags.html"></ui-component>
+	<ui-component name="importer" path="*form" config="if:formintro;url:/forms/intro.html"></ui-component>
 	<ui-component name="importer" path="*form2" config="if:formtag;url:/forms/tag.html"></ui-component>
 	<ui-component name="importer" path="*form2" config="if:formlink;url:/forms/link.html"></ui-component>
 	<ui-component name="importer" path="*form2" config="if:formfolder;url:/forms/folder.html"></ui-component>
@@ -197,6 +198,8 @@
 				exports.version();
 			});
 
+			NAV.query.welcome && setTimeout(() => exports.set('form', 'formintro'), 2000);
+
 		});
 
 		WAIT('#status', function() {
@@ -206,13 +209,13 @@
 		MIDDLEWARE('init', next => WAIT(() => user != EMPTYOBJECT, next));
 
 		ROUTE('/', function() {
-			SET('common.page', 'tickets');
+			SET('*page', 'tickets');
 		}, 'init');
 
 		ROUTE('/{folder}/', function(folder) {
 			if (folder === 'unread' && W.tickets && W.tickets.type !== 'unread')
 				SET('tickets.data', { items: [] });
-			SET('common.page', 'tickets');
+			SET('*page', 'tickets');
 		}, 'init');
 
 		$(W).on('hashchange', function() {
@@ -228,10 +231,6 @@
 			SETTER('sounds/play', 'badge');
 		});
 
-		ON('@flag showloading', function() {
-			SETTER('loading/show');
-		});
-
 		ON('@flag done', function() {
 			SETTER('notify/info', '@(Done.)');
 		});
@@ -242,10 +241,6 @@
 
 		ON('@flag removed', function() {
 			SETTER('notify/success', '@(Removed.)');
-		});
-
-		ON('@flag hideloading', function() {
-			SETTER('loading/hide', 500);
 		});
 
 		Thelpers.owner = function(val) {
@@ -297,12 +292,12 @@
 		SETTER(true, 'shortcuts/register', 'esc', function(e) {
 
 			if (common.form3) {
-				NULL('common.form3');
+				NULL('*form3');
 				return;
 			}
 
 			if (common.form2) {
-				NULL('common.form2');
+				NULL('*form2');
 				return;
 			}
 
@@ -347,15 +342,15 @@
 					return;
 				case 'sync':
 					common.clients = msg.data;
-					UPD('common.clients');
+					UPD('*clients');
 					break;
 				case 'close':
 					delete common.clients[msg.clientid];
-					UPD('common.clients');
+					UPD('*clients');
 					break;
 				case 'ticket':
 					common.clients[msg.data.clientid] = msg.data;
-					UPD('common.clients');
+					UPD('*clients');
 					break;
 			}
 
