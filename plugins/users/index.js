@@ -121,7 +121,7 @@ NEWACTION('Users|login', {
 
 			if (model.code) {
 
-				if (user.code !== model.code || model.dtcode.add('10 minutes') < NOW) {
+				if (user.code !== model.code || user.dtcode.add('10 minutes') < NOW) {
 					$.invalid('@(Invalid code)');
 					return;
 				}
