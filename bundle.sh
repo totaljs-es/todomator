@@ -9,6 +9,7 @@ cp -a ../schemas/ schemas
 cp -a ../public/ public
 cp -a ../views/ views
 cp -a ../resources/ resources
+cp -a ../templates/ templates
 rm resources/en.resource
 
 # cd ..
