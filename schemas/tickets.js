@@ -232,7 +232,7 @@ NEWSCHEMA('Tickets', function(schema) {
 
 	schema.action('create', {
 		name: 'Create ticket',
-		input: '*name:String, parentid:String, statusid:String, note:String, folderid:UID, folder:String, users:[String], userid:[String], watcherid:[String], watcherid:[String], ispriority:Number, isbillable:Boolean, ispublic:Boolean, source:String, tags:[String], html:String, markdown:String, reference:String, date:Date, deadline:Date, worked:Number, attachments:[*name:String, *data:*Base64], callback:String, attrs:Object',
+		input: '*name:String, parentid:String, statusid:String, note:String, folderid:UID, folder:String, users:[String], userid:[String], watcherid:[String], watcherid:[String], ispriority:Number, isbillable:Boolean, ispublic:Boolean, source:String, tags:[String], html:String, markdown:String, reference:String, date:Date, deadline:Date, worked:Number, attachments:[*name:String, *data:*Base64], callback:String, attrs:Object, attachments2:[Object]',
 		public: true,
 		partial: true,
 		action: async function($, model) {
@@ -335,10 +335,18 @@ NEWSCHEMA('Tickets', function(schema) {
 					}
 				}
 
-				model.attachments = JSON.stringify(attachments);
+				model.attachments = attachments;
 
 			} else
-				model.attachments = '[]';
+				model.attachments = [];
+
+			if (model.attachments2) {
+				for (let m of model.attachments2)
+					model.attachments.push(m);
+				delete model.attachments2;
+			}
+
+			model.attachments = JSON.stringify(model.attachments);
 
 			var response = await DATA.insert('tbl_ticket', model).returning(Returning).promise($);
 

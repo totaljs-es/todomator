@@ -60,7 +60,7 @@ header .toolbar button { height: 26px; font-size: 12px; }
 
 .ui-searchinput { border-radius: var(--radius); height: 24px; background-color: #FFF; line-height: 14px; }
 .ui-searchinput input { height: 22px; font-size: 12px; }
-.ui-searchinput > div { margin-left: 30px; }
+.ui-searchinput > div { margin-left: 25px; }
 .ui-searchinput > span { height: 24px; line-height: 23px; width: 25px; font-size: 12px; }
 
 .ui-dark .ui-searchinput { background-color: #333; }

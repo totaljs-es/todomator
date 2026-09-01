@@ -240,13 +240,14 @@ COMPONENT('markdownbody', 'minheightoffset:120', function(self, config, cls) {
 	};
 
 	self.resizeforce = function() {
+		/*
 		var scrollbar = self.closest('.ui-scrollbar');
 		if (scrollbar.length) {
 			var offset = self.element.offset();
 			var h = WH - scrollbar[0].scrollTop - offset.top - config.minheightoffset;
 			mbody.css('min-height', h);
 			medit.css('min-height', h);
-		}
+		}*/
 	};
 
 	self.setter = function(val, path, type) {
@@ -374,8 +375,6 @@ COMPONENT('chatmessage', function(self, config, cls) {
 	var editable = false;
 	var ticketid;
 	var cache = {};
-	var viewbox;
-	var prevmargin = 0;
 	var maincallback = null;
 	var maintext = '';
 
@@ -397,7 +396,7 @@ COMPONENT('chatmessage', function(self, config, cls) {
 
 	self.make = function() {
 		self.aclass(cls);
-		self.append('<div class="send" title="{button}"><i class="ti ti-envelope"></i></div><div class="placeholder">{placeholder}</div><div class="input"></div>'.args(config));
+		self.append('<div class="newcomment"><div class="send" title="{button}"><i class="ti ti-enter"></i></div><div class="placeholder">{placeholder}</div><div class="input" style="height:60px"></div>'.args(config));
 		input = self.find('.input');
 		placeholder = self.find('.placeholder');
 		self.rclass('invisible', 1000);
@@ -407,10 +406,6 @@ COMPONENT('chatmessage', function(self, config, cls) {
 			W.$Editable.close();
 			send();
 		});
-
-		if (config.autoheight)
-			viewbox = self.parent().parent().find('ui-component[name="viewbox"]')[0];
-
 	};
 
 	self.edit = function(val, callback) {
@@ -430,6 +425,7 @@ COMPONENT('chatmessage', function(self, config, cls) {
 
 		extendeditable(opt);
 
+		/*
 		opt.resize = function(h) {
 			var tmp = h + 25;
 
@@ -437,10 +433,9 @@ COMPONENT('chatmessage', function(self, config, cls) {
 				tmp = 45;
 
 			if (prevmargin !== tmp) {
-				setTimeout(() => viewbox.ui.reconfigure({ margin: tmp }), 5);
 				prevmargin = tmp;
 			}
-		};
+		};*/
 
 		input.aclass('editmode');
 		editable = true;

@@ -167,16 +167,16 @@ Thelpers.tagname = function(val) {
 
 MACRO('timer', function(self, element) {
 
-	var ticks = +element.attrd('ticks');
+	let ticks = +element.attrd('ticks');
 
 	self.check = function() {
 		if (!element[0].parentNode)
 			return;
-		var diff = Date.now() - ticks;
-		var s = diff / 1000 >> 0;
-		var raw = s / 60;
-		var m = raw % 60 >> 0;
-		var h = (raw / 60) % 24 >> 0;
+		let diff = Date.now() - ticks;
+		let s = diff / 1000 >> 0;
+		let raw = s / 60;
+		let m = raw % 60 >> 0;
+		let h = (raw / 60) % 24 >> 0;
 		element.html(h.padLeft(2) + ':' + m.padLeft(2) + ':' + (s % 60).padLeft(2));
 		setTimeout(self.check, 1000);
 	};

@@ -96,7 +96,7 @@
 		NAV.clientside('.jR');
 
 		(function() {
-			ADD('websocket', { url: DEF.api + '?id=' + common.clientid });
+			$('body').append('<ui-component name="websocket" config="url:{0}"></ui-component>'.format((DEF.api + '?id=' + common.clientid).replace(/:/g, '\\:')));
 		})();
 
 		Thelpers.logwork = function(val, billing) {

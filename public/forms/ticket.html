@@ -31,6 +31,8 @@
 		<div class="m">
 			<ui-component name="input" path="?.markdown" config="type:multiline;monospace:1;height:150" default="''">@(Description)</ui-component>
 		</div>
+		<ui-component name="fileuploadlist" path="?.attachments2"></ui-component>
+		<div class="help"><span class="link exec" data-exec="?/upload"><i class="ti ti-upload mr5"></i>@(Upload attachment)</span></div>
 	</div>
 	<div class="padding npb">
 
@@ -139,6 +141,19 @@
 				} else
 					refresh();
 			});
+		};
+
+		exports.upload = function(el) {
+			let opt = {};
+			let op = common.openplatform;
+			if (op)
+				op = '&' + op.substring(1);
+
+			opt.url = '/upload/ ERROR';
+			opt.callback = function(response) {
+				exports.push('attachments2', response);
+			};
+			EXEC('-fileuploader/upload', opt);
 		};
 
 	});

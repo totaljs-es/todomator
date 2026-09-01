@@ -46,6 +46,7 @@
 	.~ID~ .addtag { cursor: pointer; }
 	.~ID~ .addtag:hover { opacity: 0.8; }
 	.~ID~ .toolbar { height: 30px; }
+	.~ID~ nav span { margin-left: 5px; }
 	.~ID~ button.selected { background-color: #d7d7d7; }
 	.~ID~ button.selected2 { background-color: #EC8632; color: #FFF; }
 	.~ID~ button.selected3 { background-color: #E73323 !important; }
@@ -99,15 +100,15 @@
 	<nav>
 		<ui-bind path="?.bookmark.is" config=".selected" child=".bookmark">
 			<ui-bind path="?.istimer" config="macro:ticketdetailtimer" child=".timer">
-				<ui-bind path="?.isunread" config="macro:ticketnotificationsunread" child=".notifications">
-					<button class="exec exec2 timer" data-exec="?/timer" data-exec2="?/timer2" title="@(Toggle timer)"><i class="ti ti-play"></i></button>
-					<button class="exec comments" data-exec="?/comments" title="@(Toggle comments)"><ui-bind path="?.comments" config="text;show"></ui-bind><i class="ti ti-comment"></i></button>
-					<button class="exec bookmark" data-exec="?/bookmark" title="@(Toggle bookmark)"><i class="ti ti-bookmark"></i></button>
-					<button class="exec nm notifications" data-exec="?/notifications" title="@(Toggle notifications)"><i class="ti ti-bell"></i></button>
-					<button class="exec nm" data-exec="?/note" title="@(Note)"><i class="ti ti-lightbulb-on"></i></button>
-					<button class="exec nm" data-exec="?/logs" title="@(Logs)"><i class="ti ti-history"></i></button>
-					<button class="exec" data-exec="?/options"><i class="ti ti-sliders-h"></i>@(Options)</button>
-				</ui-bind>
+				<!-- <ui-bind path="?.isunread" config="macro:ticketnotificationsunread" child=".notifications"> -->
+				<button class="exec exec2 timer" data-exec="?/timer" data-exec2="?/timer2" title="@(Toggle timer)"><i class="ti ti-play"></i><span>@(Timer)</span></button>
+				<!--<button class="exec comments" data-exec="?/comments" title="@(Toggle comments)"><ui-bind path="?.comments" config="text;show"></ui-bind><i class="ti ti-comment"></i><span>@(Comments)</span></button>-->
+				<button class="exec nm" data-exec="?/note" title="@(Note)"><i class="ti ti-warning"></i><span>@(Note)</span></button>
+				<button class="exec bookmark" data-exec="?/bookmark" title="@(Toggle bookmark)"><i class="ti ti-bookmark"></i><span>@(Bookmark)</span></button>
+				<!-- <button class="exec nm notifications" data-exec="?/notifications" title="@(Toggle notifications)"><i class="ti ti-bell"></i></button> -->
+				<!-- <button class="exec nm" data-exec="?/logs" title="@(Time)"><i class="ti ti-history"></i><span>@(Time)</span></button> -->
+				<button class="exec" data-exec="?/options"><i class="ti ti-sliders-h"></i><span>@(Options)</span></button>
+				<!-- </ui-bind> -->
 			</ui-bind>
 		</ui-bind>
 	</nav>
@@ -233,7 +234,7 @@
 										<div class="exec control" data-exec="?/estimate">{{ value.estimate | logwork }}</div>
 									</div>
 									<div class="keyvalue">
-										<span>@(Worked)</span>
+										<span><u class="exec" data-exec="?/logs">@(Worked)</u></span>
 										<div class="exec control b" data-exec="?/logwork">{{ value.worked | logwork }} <span class="green">&bull;</span></div>
 									</div>
 								</div>
@@ -280,11 +281,14 @@
 					<div class="pull-right help exec" data-exec="?/edit" style="margin-right:10px"><i class="ti ti-pencil-alt"></i>@(Edit content)</div>
 					<div class="clearfix"></div>
 					<div class="ticketmarkdownbody">
-						<ui-component name="markdownbody" path="?.markdown" config="minheightoffset:300;save:?/savemarkdown;$setter:?/inlinecomments;placeholder:@(Double-click to edit markdown);$assign:?|markdownbody" class="hidden invisible npt nmb"></ui-component>
+						<ui-component name="markdownbody" path="?.markdown" config="minheightoffset:300;save:?/savemarkdown;$setter:?/inlinecomments;placeholder:@(Double-click to edit text);$assign:?|markdownbody" class="hidden invisible npt nmb"></ui-component>
 					</div>
 				</div>
 				<br />
 			</ui-component>
+
+			<ui-component name="importer" path="?.comments" config="if:comments;url:/parts/comments.html;path:CLASScomments;reload:CLASScomments/reload;id:ticketcomments"></ui-component>
+
 		</ui-component>
 	</div>
 </ui-plugin>
@@ -307,7 +311,12 @@
 			exports.refresh_timer();
 			exports.refresh_links();
 			exports.refresh_readers();
-			model.iscomment && setTimeout(exports.comments, 1000);
+
+			SET(exports.format('{0}comments'), { id: ID });
+			console.log(exports.format('{0}comments'));
+			exports.set('comments', 'comments');
+
+			// model.iscomment && setTimeout(exports.comments, 1000);
 		};
 
 		exports.refresh_links = function() {
@@ -579,12 +588,13 @@
 			// opt.minwidth = 400;
 			// opt.element = el;
 			// opt.monospace = true;
+			opt.multiline = true;
 			opt.centered = true;
 			opt.name = '@(Note)';
 			opt.summary = '@(Enter a note for this ticket. This note will be displayed as an alert in the ticket detail.)';
 			opt.value = model.note;
 			opt.width = 600;
-			opt.callback = function(val) {
+			opt.callback = opt.cancel = function(val) {
 
 				if (opt.value === val)
 					return;
@@ -701,7 +711,7 @@
 			opt.value = model.estimate || '';
 			opt.offsetY = -10;
 			opt.offsetX = -10;
-			opt.icon = 'ti ti-clock';
+			opt.icon = 'ti ti-stopwatch';
 			opt.summary = '@(Enter the estimated time in minutes.)';
 			opt.placeholder = '@(Minutes)';
 			opt.callback = function(val) {
@@ -930,7 +940,7 @@
 			opt.element = el;
 			opt.align = 'left';
 			opt.items = [];
-			opt.items.push({ id: 'logwork', name: '@(Log work)', class: 'b', icon: 'ti ti-clock' });
+			opt.items.push({ id: 'logwork', name: '@(Log work)', class: 'b', icon: 'ti ti-stopwatch' });
 			// opt.items.push({ id: 'close', name: '@(Mark as solved)', classname: 'b', icon: 'ti ti-check-circle green' });
 			opt.items.push('-');
 			opt.items.push({ id: 'drop', name: '@(Upload attachment)', icon: 'ti ti-file' });
@@ -938,7 +948,8 @@
 			opt.items.push({ id: 'billable', name: '@(Billable)', icon: 'ti ti-invoice', selected: model.isbillable == true });
 			opt.items.push({ id: 'public', name: '@(Open to all)', icon: 'ti ti-users', selected: model.ispublic == true });
 			opt.items.push('-');
-			opt.items.push({ id: 'logs', name: '@(Logs)', icon: 'ti ti-clock' });
+			opt.items.push({ id: 'notifications', name: '@(Logs)', icon: 'ti ti-history' });
+			opt.items.push({ id: 'logs', name: '@(Time)', icon: 'ti ti-hourglass' });
 			opt.items.push({ id: 'clone', name: '@(Clone)', icon: 'ti ti-clone' });
 			opt.items.push('-');
 			opt.items.push({ id: 'remove', name: '@(Remove)', icon: 'ti ti-remove red' });
