@@ -49,13 +49,18 @@
 		var caller;
 
 		exports.reload = function(header) {
-			var model = exports.model;
+			let model = exports.model;
 			header.reconfigure({ title: model.id ? '@(Update folder)' : '@(Create folder)' });
-			caller = exports.caller;
+			if (!caller)
+				caller = exports.caller;
 		};
 
 		exports.submit = function(hide) {
-			var form = exports.form;
+			let form = CLONE(exports.form);
+
+			if (form.email === '@')
+				form.email = '';
+
 			exports.tapi('folders_{0} ERROR'.format(form.id ? ('update/' + form.id) : 'create'), form, function() {
 				hide();
 				CLRELOAD('cl');

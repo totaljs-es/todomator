@@ -87,6 +87,8 @@
 		exports.update = function(el) {
 			var id = ATTRD(el);
 			exports.tapi('folders_read/{0} ERROR'.format(id), function(response) {
+				if (!response.email)
+					response.email = '@';
 				SET('formfolder @reset @hideloading', response);
 				SET('common.form2', 'formfolder');
 			});
