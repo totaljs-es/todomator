@@ -909,7 +909,7 @@ NEWSCHEMA('Tickets', function(schema) {
 		DATA.query('UPDATE tbl_ticket a SET comments=(SELECT COUNT(1) FROM tbl_ticket_comment x WHERE x.ticketid=a.id) WHERE a.id=' + PG_ESCAPE(id));
 	};
 
-	schema.action('comments_create', {
+	schema.action('Comments|create', {
 		name: 'Create comment',
 		input: '*ticketid:String,line:Number,*markdown:String',
 		public: true,
@@ -947,37 +947,34 @@ NEWSCHEMA('Tickets', function(schema) {
 		}
 	});
 
-	schema.action('comments_update', {
+	schema.action('Comments|update', {
 		name: 'Update comment',
-		input: '*markdown:String',
-		params: '*id:String',
+		input: '*id,*markdown:String',
 		action: async function($, model) {
 
-			var params = $.params;
-			var item = await DATA.read('tbl_ticket_comment').id(params.id).where('userid', $.user.id).error(404).promise($);
+			let item = await DATA.read('tbl_ticket_comment').id(model.id).where('userid', $.user.id).error(404).promise($);
 
 			model.username = $.user.name;
 			model.userphoto = $.user.photo;
 			model.ticketid = undefined;
 			model.dtupdated = NOW;
 
-			await DATA.modify('tbl_ticket_comment', model).id(params.id).promise($);
+			await DATA.modify('tbl_ticket_comment', model).id(model.id).promise($);
 
-			var filter = client => item.ownerid === client.user.id || item.userid.includes(client.user.id);
-			MAIN.ws && MAIN.ws.send({ TYPE: 'comment', id: params.id }, filter);
+			let filter = client => item.ownerid === client.user.id || item.userid.includes(client.user.id);
+			MAIN.ws && MAIN.ws.send({ TYPE: 'comment', id: model.id }, filter);
 
-			$.success(params.id);
+			$.success(model.id);
 		}
 	});
 
-	schema.action('comments_remove', {
+	schema.action('Comments|remove', {
 		name: 'Remove comment',
-		params: '*id:String',
-		action: async function($) {
-			var params = $.params;
-			var comment = await DATA.remove('tbl_ticket_comment').id(params.id).where('userid', $.user.id).returning('ticketid').error(404).promise($);
+		model: '*id',
+		action: async function($, model) {
+			var comment = await DATA.remove('tbl_ticket_comment').id(model.id).where('userid', $.user.id).returning('ticketid').error(404).promise($);
 			updatecommentscount(comment[0].ticketid);
-			$.success(params.id);
+			$.success(model.id);
 		}
 	});
 

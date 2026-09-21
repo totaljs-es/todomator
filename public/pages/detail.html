@@ -12,7 +12,10 @@
 	.~ID~ .ui-box-label { font-weight: normal; color: #A0A0A0; font-size: 13px; user-select: text; font-family: Menlo, Consolas, monospace; }
 	.~ID~ .meta i { transform: scale(1); }
 	.~ID~ .attachments { font-size: 12px; padding: 0; margin-top: 10px; }
-	.~ID~ .attachments .file { text-overflow: ellipsis; white-space: nowrap; overflow: hidden; background-color: #FFF; border-radius: var(--radius); padding: 4px 5px; display: block; vertical-align: top; color: #777; margin-top: 2px; }
+	.~ID~ .attachments .file { text-overflow: ellipsis; white-space: nowrap; overflow: hidden; background-color: #FFF; padding: 4px 5px; display: block; vertical-align: top; color: #777; border: 1px solid #E0E0E0; border-top: 0; }
+	.~ID~ .attachments .group { text-overflow: ellipsis; white-space: nowrap; overflow: hidden; background-color: rgba(0,0,0,0.05); border-radius: var(--radius) var(--radius) 0 0; padding: 5px 5px; display: block; vertical-align: top; color: #777; margin-top: 10px; border: 1px solid #E0E0E0; font-size: 11px; }
+	.~ID~ .attachments .file:last-child { border-radius: 0 0 var(--radius) var(--radius); }
+	.~ID~ .attachments .group:first-child { margin-top: 0; }
 	.~ID~ .keyvalue { min-height: 20px; }
 	.~ID~ .keyvalue > div { padding: 3px 5px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; min-height: 18px }
 	.~ID~ .keyvalue > span { padding-top: 2px; }
@@ -244,9 +247,7 @@
 							<hr />
 							<div class="b"><i class="ti ti-paperclip mr5"></i>@(Attachments)</div>
 							<div class="attachments">
-								{{ foreach m in value.attachments }}
-								<a href="{{ m.url }}" target="_blank" class="file quickpreview"><span class="pull-right fs11 red ml5 exec" data-exec="?/remattachment" data-prevent="true" data-id="{{ m.id }}"><i class="ti ti-remove"></i></span><span class="pull-right fs11 ml10">{{ m.dtcreated | format('[date]') }}</span><span class="pull-right silver fs11">{{ m.size | filesize }}</span><i class="ti ti-file mr5"></i>{{ m.name }}</a>
-								{{ end }}
+								{{ value.attachments | attachments }}
 							</div>
 							{{ fi }}
 						</script>
@@ -294,6 +295,39 @@
 </ui-plugin>
 
 <script>
+
+	const Tattachments = Tangular.compile(`{{ foreach m in value }}<a href="{{ m.url }}" target="_blank" class="file quickpreview"><span class="pull-right fs11 red ml5 exec" data-exec="?/remattachment" data-prevent="true" data-id="{{ m.id }}"><i class="ti ti-remove"></i></span><span class="pull-right silver fs11">{{ m.size | filesize }}</span><i class="ti {{ m.icon }} mr5"></i>{{ m.name }}</a>{{ end }}`);
+
+	Thelpers.attachments = function(arr) {
+		let ext = {
+			jpg: 'ti-file-image',
+			jpeg: 'ti-file-image',
+			png: 'ti-file-image',
+			svg: 'ti-file-image',
+			ico: 'ti-file-image',
+			webp: 'ti-file-image',
+			pdf: 'ti-file-pdf',
+			docx: 'ti-file-word',
+			doc: 'ti-file-word',
+			xlsx: 'ti-file-excel',
+			xls: 'ti-file-excel',
+			zip: 'ti-box-up',
+			rar: 'ti-box-up',
+			md: 'ti-markdown'
+		};
+		for (let m of arr) {
+			m.group = m.dtcreated.format('[date]');
+			m.icon = ext[m.ext] || 'ti-file';
+		}
+		let tmp = arr.group('group');
+		let builder = [];
+		for (let m of tmp) {
+			builder.push('<div class="group monospace"><i class="ti ti-calendar mr5"></i>{0}</div>'.format(m.name));
+			builder.push('<div class="files">{0}</div>'.format(Tattachments({ value: m.items })));
+		}
+		return builder.join('');
+	};
+
 	PLUGIN('CLASS formdetail', function(exports) {
 
 		var changed = false;
@@ -313,7 +347,6 @@
 			exports.refresh_readers();
 
 			SET(exports.format('{0}comments'), { id: ID });
-			console.log(exports.format('{0}comments'));
 			exports.set('comments', 'comments');
 
 			// model.iscomment && setTimeout(exports.comments, 1000);
@@ -384,7 +417,7 @@
 					data.ownerid = user.id;
 					data.date = new Date();
 					data.worked = '10';
-					exports.tapi('tickets_create ERROR', data, response => opt.callback({ id: response.value, skip: true }));
+					exports.tapi('Tickets|create ERROR', data, response => opt.callback({ id: response.value, skip: true }));
 					return;
 				}
 
@@ -849,6 +882,7 @@
 				}
 
 				model.attachments.push.apply(model.attachments, response);
+
 				exports.tapi('tickets_update/{0} ERROR'.format(model.id), { attachments: model.attachments }, function() {
 					changed = true;
 					exports.upd('id');
@@ -1314,7 +1348,7 @@
 						var line = +el.attrd('line');
 						val = '> :ti ti-long-arrow-right: ' + el.text().replace(/\s{2,}/g, ' ').trim().replace(/\n/g, '<br>') + '\n' + val;
 						SETTER('sounds/play', 'badge');
-						TAPI('comments_create ERROR', { ticketid: plugin.model.id, markdown: val, line: line }, function() {
+						TAPI('Comments|create ERROR', { ticketid: plugin.model.id, markdown: val, line: line }, function() {
 							var detail = plugin;
 							var model = detail.model;
 							detail.inc('comments', 1);

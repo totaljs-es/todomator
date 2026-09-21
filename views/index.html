@@ -291,6 +291,11 @@
 
 		SETTER(true, 'shortcuts/register', 'esc', function(e) {
 
+			if ($('.ui-menu-visible').length) {
+				SETTER('menu/hide');
+				return;
+			}
+
 			if (common.form3) {
 				NULL('*form3');
 				return;

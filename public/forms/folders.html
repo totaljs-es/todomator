@@ -70,7 +70,7 @@
 
 		exports.add = function() {
 			SET('formfolder @default', {});
-			SET('common.form2', 'formfolder');
+			SET('*form2', 'formfolder');
 		};
 
 		exports.remove = function(el) {
@@ -90,7 +90,7 @@
 				if (!response.email)
 					response.email = '@';
 				SET('formfolder @reset @hideloading', response);
-				SET('common.form2', 'formfolder');
+				SET('*form2', 'formfolder');
 			});
 		};
 	});
